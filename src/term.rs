@@ -34,7 +34,43 @@ pub enum Term {
 	/// The first term is evaluated, then divided by each following term in order of ascending index (each term is used immediately after evaluation). Fairly aggressive sanity checks are performed to prevent division by zero; if this continues to pester you, consider multiplying by the inverse instead.
 	///
 	/// This variant should be considered unstable; it is only due to typing constraints that simplification is implemented for more than two subterms. **Consider using `Term::Product` instead, if possible.**
-	Quotient(Vec<Term>) // Look into limiting vector sizes to avoid confusion (due to bad input)
+	Quotient(Vec<Term>), // Look into limiting vector sizes to avoid confusion (due to bad input).
+	/// Represents the sine function.
+	///
+	/// The associated term is evaluated and passed to a sine function to obtain a result.
+	///
+	/// Like any self-respecting sine function, this performs operations "in radians."
+	Sine(Box<Term>), // TODO: Verify that this is what we want (this uses heap memory).
+	/// Represents the cosine function.
+	///
+	/// The associated term is evaluated and passed to a cosine function to obtain a result.
+	///
+	/// Like any self-respecting cosine function, this performs operations "in radians."
+	Cosine(Box<Term>), // TODO: Verify that this is what we want (this uses heap memory).
+	/// Represents the tangent function.
+	///
+	/// The associated term is evaluated and passed to a tangent function to obtain a result.
+	///
+	/// Like any self-respecting cosine function, this performs operations "in radians."
+	Tangent(Box<Term>), // TODO: Verify that this is what we want (this uses heap memory).
+	/// Represents the inverse sine function.
+	///
+	/// The associated term is evaluated and passed to an inverse sine function to obtain a result.
+	///
+	/// Like any self-respecting trigonometric function, this performs operations "in radians."
+	ArcSine(Box<Term>), // TODO: Verify that this is what we want (this uses heap memory).
+	/// Represents the inverse cosine function.
+	///
+	/// The associated term is evaluated and passed to an inverse cosine function to obtain a result.
+	///
+	/// Like any self-respecting trigonometric function, this performs operations "in radians."
+	ArcCosine(Box<Term>), // TODO: Verify that this is what we want (this uses heap memory).
+	/// Represents the inverse tangent function.
+	///
+	/// The associated term is evaluated and passed to an inverse tangent function to obtain a result.
+	///
+	/// Like any self-respecting trigonometric function, this performs operations "in radians."
+	ArcTangent(Box<Term>) // TODO: Verify that this is what we want (this uses heap memory).
 }
 
 impl Term {
@@ -147,6 +183,36 @@ impl Term {
 					}
 				} else {
 					Err(format!("No variable values provided (looking for {})", variable.symbol))
+				}
+			}, Sine(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.sin()),
+					Err(e) => Err(e)
+				}
+			}, Cosine(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.cos()),
+					Err(e) => Err(e)
+				}
+			}, ArcSine(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.asin()),
+					Err(e) => Err(e)
+				}
+			}, ArcCosine(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.acos()),
+					Err(e) => Err(e)
+				}
+			}, Tangent(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.tan()),
+					Err(e) => Err(e)
+				}
+			}, ArcTangent(ref term) => {
+				match term.eval(values) {
+					Ok(value) => Ok(value.atan()),
+					Err(e) => Err(e)
 				}
 			}
 		}
