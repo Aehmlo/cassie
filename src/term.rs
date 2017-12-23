@@ -9,11 +9,31 @@ type VariableValues = HashMap<char, f64>;
 /// The `Term` data type (currently) represents basic polynomial components, which can be assigned a numeric value with `Term::evaluate`/`Term::reduce`.
 #[derive(Clone)]
 pub enum Term {
+	/// Represents a term which simply a variable, one of the two foundational term types.
+	///
+	/// The value of the variable is looked up against the given variable values when `Term::evaluate` is called.
 	Variable(Variable),
+	/// Represents a constant term, one of the two foundational term types.
+	///
+	/// The value of this term is fixed and is calculated by simply unpacking the associated value.
 	Constant(f64),
+	/// Represents a sum of multiple terms.
+	///
+	/// To calculate the value of this term, the components are evaluated iteratively from the first to last index.
 	Sum(Vec<Term>),
+	/// Represents a difference of terms.
+	///
+	/// The first term is used as-is; all others have their signs inverted and are added to the first term in ascending order of index.
 	Difference(Vec<Term>),
+	/// Represents a product of terms.
+	///
+	/// All terms are multiplied together after evaluation, with evaluation proceeding in ascending index order.
 	Product(Vec<Term>),
+	/// Represents a quotient of terms.
+	///
+	/// The first term is evaluated, then divided by each following term in order of ascending index (each term is used immediately after evaluation). Fairly aggressive sanity checks are performed to prevent division by zero; if this continues to pester you, consider multiplying by the inverse instead.
+	///
+	/// This variant should be considered unstable; it is only due to typing constraints that simplification is implemented for more than two subterms. **Consider using `Term::Product` instead, if possible.**
 	Quotient(Vec<Term>) // Look into limiting vector sizes to avoid confusion (due to bad input)
 }
 
@@ -108,7 +128,7 @@ impl Term {
 				for term in terms {
 					match term.eval(values) {
 						Ok(dividend) => {
-							if dividend.abs() <  0.00001 {
+							if dividend.abs() <  0.00000000000000001 {
 								return Err("Attempted division by zero.".to_string());
 							}
 							quotient /= dividend;
