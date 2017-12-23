@@ -12,14 +12,50 @@ pub enum Term {
 	/// Represents a term which simply a variable, one of the two foundational term types.
 	///
 	/// The value of the variable is looked up against the given variable values when `Term::evaluate` is called.
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::{Term, Variable};
+	/// use std::collections::HashMap;
+	///
+	/// let mut bindings = HashMap::new();
+	/// bindings.insert('φ', 68.0);
+	///
+	/// let f = Variable::named('φ');
+	/// let f = Term::Variable(f);
+	/// assert!(f.evaluate(&bindings).unwrap() - 68.0 < 0.00001);
+	/// ```
 	Variable(Variable),
 	/// Represents a constant term, one of the two foundational term types.
 	///
 	/// The value of this term is fixed and is calculated by simply unpacking the associated value.
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::Term;
+	///
+	/// let c = Term::Constant(24.0);
+	/// assert!(c.reduce().unwrap() - 24.0 < 0.00001);
+	/// ```
 	Constant(f64),
 	/// Represents a sum of multiple terms.
 	///
 	/// To calculate the value of this term, the components are evaluated iteratively from the first to last index.
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::Term;
+	///
+	/// let a = Term::Constant(24.0);
+	/// let b = Term::Constant(72.0);
+	/// let y = Term::Sum(vec!(a, b)); // Notice that this is very ugly; see below
+	/// assert!(y.reduce().unwrap() - 108.0 < 0.00001);
+	///
+	/// let c = Term::Constant(12.0);
+	/// let d = Term::Constant(27.0);
+	/// let z = c + d; // Preferred
+	/// assert!(z.reduce().unwrap() - 39.0 < 0.00001);
+	/// ```
 	Sum(Vec<Term>),
 	/// Represents a difference of terms.
 	///
