@@ -3,13 +3,12 @@ name = "cassie"
 license = "ISC"
 version = "0.1.0"
 authors = ["Alex Hamilton <cassie@hmltn.me>"]
-description = " "
+description = "A simple, limited CAS system written for the fun of it."
 homepage = "https://github.com/aehmlo/cassie"
 documentation = "https://docs.rs/cassie"
 repository = "https://github.com/aehmlo/cassie"
 readme = "README.md"
-keywords = []
-categories = []
-
+keywords = ["algebra", "symbolic", "math"]
+categories = ["algorithms", "science"]
 
 [dependencies]
