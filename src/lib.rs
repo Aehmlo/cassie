@@ -1,5 +1,7 @@
+mod term;
 mod variable;
 
+pub use term::Term;
 pub use variable::Variable;
 
 #[cfg(test)]

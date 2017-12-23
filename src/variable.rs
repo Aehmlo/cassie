@@ -4,7 +4,7 @@ use std::fmt;
 /// A variable represents a value which is arbitrary or unknown.
 ///
 /// The assumption that this object will eventually be assigned a meaningful value is the basis of algebraic manipulation.
-#[derive(PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct Variable {
 	pub symbol: char
 }
