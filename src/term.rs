@@ -176,17 +176,3 @@ impl Add for Term { // We clone things a lot just in case a mutable operation is
 		&self + &another
 	}
 }
-
-mod tests {
-	#[allow(unused_imports)]
-	use Term::Constant;
-	#[test]
-	fn term_sums() {
-		let a = Constant(36.0);
-		let b = Constant(64.0);
-		let c = &a + &b;
-		assert!(a.reduce().unwrap() - 36.0 < 0.00001);
-		assert!(b.reduce().unwrap() - 64.0 < 0.00001);
-		assert!(c.reduce().unwrap() - 100.0 < 0.00001);
-	}
-}
