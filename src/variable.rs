@@ -9,14 +9,43 @@ pub struct Variable {
 	pub symbol: char
 }
 
+impl Variable {
+	/// Creates a variable with associated symbol `symbol`.
+	///
+	/// # Examples
+	/// ```
+	/// use cassie::Variable;
+	/// let x = Variable::named('x');
+	/// assert_eq!(x.symbol, 'x');
+	/// let v = Variable::named('ν');
+	/// assert_eq!(v.symbol, 'ν');
+	/// ```
+	pub fn named(symbol: char) -> Self {
+		Self { symbol }
+	}
+	/// An alias for `Variable::named`.
+	/// 
+	/// # Examples
+	/// ```
+	/// use cassie::Variable;
+	/// let x = Variable::new('x');
+	/// assert_eq!(x.symbol, 'x');
+	/// let v = Variable::new('ν');
+	/// assert_eq!(v.symbol, 'ν');
+	/// ```
+	pub fn new(c: char) -> Self {
+		Self::named(c)
+	}
+}
+
 impl fmt::Debug for Variable {
 	/// Variables may be printed using the fmt::Debug trait.
 	/// # Examples
 	/// ```
 	/// use cassie::Variable;
-	/// let var = Variable { symbol: 'x' };
+	/// let var = Variable::named('x');
 	/// assert_eq!(&format!("{:?}", var), "x");
-	/// let var = Variable { symbol: 'α' };
+	/// let var = Variable::named('α');
 	/// assert_eq!(&format!("{:?}", var), "α");
 	/// ```
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
