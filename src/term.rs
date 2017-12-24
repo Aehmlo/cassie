@@ -197,7 +197,7 @@ impl Term {
 				let first = terms[0].eval(values);
 				if first.is_err() { return first; }
 				let mut quotient = first.unwrap();
-				for term in terms {
+				for term in terms[1..].iter() {
 					match term.eval(values) {
 						Ok(dividend) => {
 							if dividend.abs() <  0.00000000000000001 {
