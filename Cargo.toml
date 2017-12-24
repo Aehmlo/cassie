@@ -1,7 +1,7 @@
 [package]
 name = "cassie"
 license = "ISC"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Alex Hamilton <cassie@hmltn.me>"]
 description = "A simple, limited computer algebra system written for the fun of it."
 homepage = "https://github.com/aehmlo/cassie"
