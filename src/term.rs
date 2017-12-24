@@ -1,6 +1,9 @@
 use variable::Variable;
 use std::collections::HashMap;
 use std::ops::Add;
+use std::ops::Sub;
+use std::ops::Mul;
+use std::ops::Div;
 
 type VariableValues = HashMap<char, f64>;
 
@@ -60,16 +63,61 @@ pub enum Term {
 	/// Represents a difference of terms.
 	///
 	/// The first term is used as-is; all others have their signs inverted and are added to the first term in ascending order of index.
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::Term;
+	///
+	/// let a = Term::Constant(24.0);
+	/// let b = Term::Constant(72.0);
+	/// let y = Term::Difference(vec!(a, b)); // Notice that this is very ugly; see below
+	/// assert!((y.reduce().unwrap() + 48.0).abs() < 0.00001);
+	///
+	/// let c = Term::Constant(12.0);
+	/// let d = Term::Constant(27.0);
+	/// let z = c - d; // Preferred
+	/// assert!((z.reduce().unwrap() + 15.0).abs() < 0.00001);
+	/// ```
 	Difference(Vec<Term>),
 	/// Represents a product of terms.
 	///
 	/// All terms are multiplied together after evaluation, with evaluation proceeding in ascending index order.
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::Term;
+	///
+	/// let a = Term::Constant(8.0);
+	/// let b = Term::Constant(9.0);
+	/// let y = Term::Product(vec!(a, b)); // Notice that this is very ugly; see below
+	/// assert!((y.reduce().unwrap() - 72.0).abs() < 0.00001);
+	///
+	/// let c = Term::Constant(3.0);
+	/// let d = Term::Constant(-1.0);
+	/// let z = c * d; // Preferred
+	/// assert!((z.reduce().unwrap() + 3.0).abs() < 0.00001);
+	/// ```
 	Product(Vec<Term>),
 	/// Represents a quotient of terms.
 	///
 	/// The first term is evaluated, then divided by each following term in order of ascending index (each term is used immediately after evaluation). Fairly aggressive sanity checks are performed to prevent division by zero; if this continues to pester you, consider multiplying by the inverse instead.
 	///
-	/// This variant should be considered unstable; it is only due to typing constraints that simplification is implemented for more than two subterms. **Consider using `Term::Product` instead, if possible.**
+	/// This variant should be considered more or less unstable; it is only due to typing constraints that simplification is implemented for more than two subterms. **Consider using `Term::Product` instead, if possible.**
+	///
+	/// #Examples
+	/// ```
+	/// use cassie::Term;
+	///
+	/// let a = Term::Constant(63.0);
+	/// let b = Term::Constant(3.0);
+	/// let y = Term::Quotient(vec!(a, b)); // Notice that this is very ugly; see below
+	/// assert!((y.reduce().unwrap() - 21.0).abs() < 0.00001);
+	///
+	/// let c = Term::Constant(3.0);
+	/// let d = Term::Constant(-1.0);
+	/// let z = c / d; // Preferred
+	/// assert!((z.reduce().unwrap() + 3.0).abs() < 0.00001);
+	/// ```
 	Quotient(Vec<Term>), // Look into limiting vector sizes to avoid confusion (due to bad input).
 	/// Represents the sine function.
 	///
@@ -255,46 +303,74 @@ impl Term {
 	}
 }
 
-impl<'a, 'b> Add<&'b Term> for &'a Term { // We clone things a lot just in case a mutable operation is later defined on Term; we don't want to be chasing those bugs!
+impl<'a, 'b> Add<&'b Term> for &'a Term {
 
 	type Output = Term;
 
 	fn add(self, another: &'b Term) -> Term {
-		match *self {
-			Term::Sum(ref terms) => {
-				match *another {
-					Term::Sum(ref more) => {
-						let mut terms = terms.clone();
-						for term in more {
-							terms.push(term.clone());
-						}
-						Term::Sum(terms)
-					}, _ => {
-						let mut terms = terms.clone();
-						terms.push(another.clone());
-						Term::Sum(terms)
-					}
-				}
-			}, _ => {
-				match *another {
-					Term::Sum(ref terms) => {
-						let mut terms = terms.clone();
-						terms.push(self.clone());
-						Term::Sum(terms)
-					}, _ => {
-						Term::Sum(vec!(self.clone(), another.clone()))
-					}
-				}
-			}
-		}
+		Term::Sum(vec!(self.clone(), another.clone()))
 	}
 }
 
-impl Add for Term { // We clone things a lot just in case a mutable operation is later defined on Term; we don't want to be chasing those bugs!
+impl Add for Term {
 
 	type Output = Term;
 
 	fn add(self, another: Term) -> Term {
 		&self + &another
+	}
+}
+
+impl<'a, 'b> Sub<&'b Term> for &'a Term {
+
+	type Output = Term;
+
+	fn sub(self, another: &'b Term) -> Term {
+		Term::Difference(vec!(self.clone(), another.clone()))
+	}
+}
+
+impl Sub for Term {
+
+	type Output = Term;
+
+	fn sub(self, another: Term) -> Term {
+		&self - &another
+	}
+}
+
+impl<'a, 'b> Mul<&'b Term> for &'a Term {
+
+	type Output = Term;
+
+	fn mul(self, another: &'b Term) -> Term {
+		Term::Product(vec!(self.clone(), another.clone()))
+	}
+}
+
+impl Mul for Term {
+
+	type Output = Term;
+
+	fn mul(self, another: Term) -> Term {
+		&self * &another
+	}
+}
+
+impl<'a, 'b> Div<&'b Term> for &'a Term {
+
+	type Output = Term;
+
+	fn div(self, another: &'b Term) -> Term {
+		Term::Quotient(vec!(self.clone(), another.clone()))
+	}
+}
+
+impl Div for Term {
+
+	type Output = Term;
+
+	fn div(self, another: Term) -> Term {
+		&self / &another
 	}
 }
