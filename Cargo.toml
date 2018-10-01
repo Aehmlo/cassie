@@ -10,5 +10,6 @@ repository = "https://github.com/aehmlo/cassie"
 readme = "README.md"
 keywords = ["algebra", "symbolic", "math"]
 categories = ["algorithms", "science"]
+maintenance = "deprecated"
 
 [dependencies]
